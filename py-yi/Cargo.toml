@@ -11,4 +11,6 @@ crate-type = ["cdylib"]
 pyo3 = { version = "0.26", features = ["extension-module"] }
 tea-yi = { path = "../tea-yi" }
 pyo3-polars = { version = "0.25", features=["derive"]}
+# polars = {version = "0.52", features=["rolling_window"], default-features = false}
 serde = "1"
+tevec = {git="https://github.com/teamon9161/tevec.git", rev = "a54d6f4", features=["polars"], default-features = false}

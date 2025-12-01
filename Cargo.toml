@@ -1,4 +1,4 @@
 [workspace]
 members = ["tea-yi", "py-yi"]
-default-members = ["tea-yi"]
+default-members = ["tea-yi", "py-yi"]
 resolver = "2"
