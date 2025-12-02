@@ -1,21 +1,47 @@
-use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
+use pyo3_polars::derive::polars_expr;
+use pyo3_polars::export::polars_core::prelude::*;
+use pyo3_polars::export::polars_error::PolarsResult;
+use pyo3_polars::types::*;
+use serde::Deserialize;
 use tea_yi::Hexagram;
 
-/// Convert 6 bools (upper to lower) into hexagram info (kw index, name, unicode symbol).
-#[pyfunction]
-fn hexagram_info(bits: Vec<bool>) -> PyResult<(u8, String, String)> {
-    if bits.len() != 6 {
-        return Err(PyValueError::new_err("expected 6 booleans (upper to lower lines)"));
-    }
+macro_rules! auto_cast {
+    // for one expression
+    ($arm: ident ($se: expr)) => {
+        if let DataType::$arm = $se.dtype() {
+            $se
+        } else {
+            &$se.cast(&DataType::$arm)?
+        }
+    };
+    // for multiple expressions
+    ($arm: ident ($($se: expr),*)) => {
+        ($(
+            if let DataType::$arm = $se.dtype() {
+                $se
+            } else {
+                &$se.cast(&DataType::$arm)?
+            }
+        ),*)
+    };
+}
 
-    let hex = Hexagram::from_slice(&bits);
-    Ok((hex.kw(), hex.name().to_string(), hex.unicode().to_string()))
+#[derive(Deserialize)]
+pub struct YiParams {
+    rev: bool,
+}
+
+#[polars_expr(output_type=String)]
+fn evaluators_future_dirty_price(inputs: &[Series], kwargs: YiParams) -> PolarsResult<Series> {
+    let series = auto_cast!(Boolean(&inputs[0]));
+    series.bool()?;
+    todo!();
 }
 
 /// Python module initializer.
 #[pymodule]
-fn py_yi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(hexagram_info, m)?)?;
+fn py_yi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    // m.add_function(wrap_pyfunction!(hexagram_info, m)?)?;
     Ok(())
 }
