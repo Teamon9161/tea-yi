@@ -1,0 +1,12 @@
+[package]
+name = "py-yi"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "py_yi"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.21", features = ["extension-module"] }
+tea-yi = { path = "../tea-yi" }
